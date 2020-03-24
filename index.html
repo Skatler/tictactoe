@@ -2,31 +2,46 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
-    <script src="p5.min.js"></script>
-    <script src="script.js"></script>
+
+    <title>TicTacToe</title>
+
     <link rel="stylesheet" type="text/css" href="theme.css">
     <link href="https://fonts.googleapis.com/css?family=Quicksand:700&display=swap" rel="stylesheet">
+
   </head>
+
   <body>
-    <div class="buttonDiv">
-        <div class="addButtons">
-          <button type="button" name="button" onclick="addRow()">Add Row</button>
-          <button type="button" name="button" onclick="addCol()">Add Col</button>
-        </div>
-        <div class="removeButtons">
-          <button type="button" name="button" onclick="delRow()">Del Row</button>
-          <button type="button" name="button" onclick="delCol()">Del Col</button>
-        </div>
-    </div>
-    <div id="canvasContainer">
-    </div>
-    <div class="buttonDiv2">
-        <div class="timelineButtons">
-          <button type="button" name="button" onclick="undoBoard()">Undo</button>
-          <button type="button" name="button" onclick="nextBoard()">Next</button>
-        </div>
-          <button type="button" name="button" onclick="clearBoard()">Reset</button>
-    </div>
+      <div class="buttonDiv">
+
+          <div class="addButtons">
+            <button type="button" name="button" onclick="addRow()">Add Row</button>
+            <button type="button" name="button" onclick="addCol()">Add Col</button>
+          </div>
+
+          <div class="removeButtons">
+            <button type="button" name="button" onclick="delRow()">Del Row</button>
+            <button type="button" name="button" onclick="delCol()">Del Col</button>
+          </div>
+
+      </div>
+
+      <div id="canvasContainer">
+      </div>
+
+      <div class="buttonDiv2">
+
+          <div class="timelineButtons">
+            <button type="button" name="button" onclick="undoBoard()">Undo</button>
+            <button type="button" name="button" onclick="nextBoard()">Next</button>
+          </div>
+
+            <button type="button" name="button" onclick="clearBoard()">Reset</button>
+            
+      </div>
+
+    <script src="js/p5.min.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/minimax.js"></script>
+    <script src="js/script.js"></script>
   </body>
 </html>
