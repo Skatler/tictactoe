@@ -15,7 +15,8 @@ let emptySpaces;
 let scores= {
   X: 10,
   O: -10,
-  tie: 0
+  tie: 0,
+  null:0
 };
 let savedBoards=new Array();
 let currentBoard=-1;
@@ -86,20 +87,7 @@ function bestMove() {
   // AI to make its turn
   let bestScore = -Infinity;
   let move;
-  if (currentMove=='X') {
-    scores = {
-      X: 10,
-      O: -10,
-      tie: 0
-    };
-  }
-  else {
-    scores = {
-      X: -10,
-      O: 10,
-      tie: 0
-    };
-  }
+  swapScores();
   for (let i = 0; i < rowNumber; i++) {
     for (let j = 0; j < colNumber; j++) {
       // Is the spot available?
@@ -118,6 +106,7 @@ function bestMove() {
   board[move.i][move.j] = currentMove;
   saveBoard();
   currentMove = [otherMove, otherMove = currentMove][0];
+  swapScores();
 }
 
 function saveBoard(){
@@ -127,6 +116,22 @@ function saveBoard(){
   }
   currentBoard++;
 }
+function swapScores(){
+  if (currentMove=='X') {
+    scores = {
+      X: 10,
+      O: -10,
+      tie: 0
+    };
+  }
+  else {
+    scores = {
+      X: -10,
+      O: 10,
+      tie: 0
+    };
+  }
+}
 function undoBoard(){
   if (currentBoard!=0) {
     currentBoard--;
@@ -135,6 +140,7 @@ function undoBoard(){
         board[i][j]=savedBoards[currentBoard][i][j];
       }
     }
+  swapScores();
   currentMove = [otherMove, otherMove = currentMove][0];
 }else {
   window.alert("cannot undo");
@@ -149,6 +155,7 @@ function nextBoard(){
       }
     }
     currentMove = [otherMove, otherMove = currentMove][0];
+      swapScores();
   }
   else{ if (isClear) {
     board[floor(random(rowNumber))][floor(random(colNumber))]='X';
@@ -156,9 +163,12 @@ function nextBoard(){
     currentMove = [otherMove, otherMove = currentMove][0];
     isClear=false;
   }
-  else if (checkWin(true)==null) {
+  else if (checkWin()==null) {
     console.time();
       bestMove();
+  }
+  else {
+      clearBoard();
   }
 }
 }
@@ -229,7 +239,7 @@ function minimax(position, depth, alpha, beta, maximizingPlayer){
   }
 
 
-function mousePressed(evt) {
+function mouseClicked(evt) {
   let x=evt.offsetX;
   let y=evt.offsetY;
   for(let i=1;i<=colNumber;i++){
@@ -242,6 +252,7 @@ function mousePressed(evt) {
           board[j-1][i-1]=currentMove;
           saveBoard();
           currentMove = [otherMove, otherMove = currentMove][0];
+          swapScores();
           isClear=false;
       }
       else {
@@ -293,7 +304,159 @@ function delCol(){
   currentBoard=-1;
   saveBoard();
 }
-
+function checkHorizontal(){
+  let bigScore=0;
+  for(let i=0;i<rowNumber;i++){
+    let score=0;
+    let elem;
+    for(let j=0;j<colNumber;j++){
+      if (elem==undefined) {
+        if (board[i][j]!=null) {
+          elem=board[i][j];
+          score+=scores[elem];
+        }
+      }
+      else {
+        if(elem!=board[i][j]&&board[i][j]!=null){
+          score=0;
+          break;
+        }
+        else if (elem==board[i][j]) {
+          score+=scores[elem];
+        }
+      }
+    }
+    bigScore+=score/colNumber;
+  }
+  return bigScore;
+}
+function checkVertical(){
+  let bigScore=0;
+  for(let j=0;j<colNumber;j++){
+    let score=0;
+    let elem;
+    for(let i=0;i<rowNumber;i++){
+      if (elem==undefined) {
+        if (board[i][j]!=null) {
+          elem=board[i][j];
+          score+=scores[elem];
+        }
+      }
+      else {
+        if(elem!=board[i][j]&&board[i][j]!=null){
+          score=0;
+          break;
+        }
+        else if (elem==board[i][j]) {
+          score+=scores[elem];
+        }
+      }
+    }
+    bigScore+=score/colNumber;
+  }
+  return bigScore;
+}
+function checkDiag(){
+  let bigScore=0;
+  for(let j=0;j<Math.abs(colNumber-rowNumber)+1;j++){
+    let score=0;
+    let elem;
+    if (colNumber<rowNumber) {
+    for(let i=0;i<colNumber;i++){
+      if (elem==undefined) {
+        if (board[i+j][i]!=null) {
+          elem=board[i+j][i];
+          score+=scores[elem];
+        }
+      }
+      else {
+        if(elem!=board[i+j][i]&&board[i+j][i]!=null){
+          score=0;
+          break;
+        }
+        else if (elem==board[i+j][i]) {
+          score+=scores[elem];
+        }
+      }
+    }
+    bigScore+=score/colNumber;
+  }
+  else
+  {
+    for(let i=0;i<rowNumber;i++){
+      if (elem==undefined) {
+        if (board[i][i+j]!=null) {
+          elem=board[i][i+j];
+          score+=scores[elem];
+        }
+      }
+      else {
+        if(elem!=board[i][i+j]&&board[i][i+j]!=null){
+          score=0;
+          break;
+        }
+        else if (elem==board[i][i+j]) {
+          score+=scores[elem];
+        }
+      }
+    }
+    bigScore+=score/rowNumber;
+  }
+}
+  return bigScore;
+}
+function checkDiag2(){
+  let bigScore=0;
+  for(let j=0;j<Math.abs(colNumber-rowNumber)+1;j++){
+    let score=0;
+    let elem;
+    if (colNumber<rowNumber) {
+    for(let i=colNumber-1;i>-1;i--){
+      if (elem==undefined) {
+        if (board[colNumber-1-i+j][i]!=null) {
+          elem=board[colNumber-1-i+j][i];
+          score+=scores[elem];
+        }
+      }
+      else {
+        if(elem!=board[colNumber-1-i+j][i]&&board[colNumber-1-i+j][i]!=null){
+          score=0;
+          break;
+        }
+        else if (elem==board[colNumber-1-i+j][i]) {
+          score+=scores[elem];
+        }
+      }
+    }
+    bigScore+=score/colNumber;
+  }
+  else
+  {
+    for(let i=rowNumber-1;i>-1;i--){
+      if (elem==undefined) {
+        if (board[i][rowNumber-1-i+j]!=null) {
+          elem=board[i][rowNumber-1-i+j];
+          score+=scores[elem];
+        }
+      }
+      else {
+        if(elem!=board[i][rowNumber-1-i+j]&&board[i][rowNumber-1-i+j]!=null){
+          score=0;
+          break;
+        }
+        else if (elem==board[i][rowNumber-1-i+j]) {
+          score+=scores[elem];
+        }
+      }
+    }
+    bigScore+=score/rowNumber;
+  }
+}
+  return bigScore;
+}
+function checkState(){
+  return checkHorizontal()+checkVertical()+checkDiag()+checkDiag2();
+}
 function checkH(){
   let horizontal;
   for(let i=0;i<rowNumber;i++){
@@ -309,47 +472,7 @@ function checkH(){
     }
   }
 }
-function checkAH(){
-    let almostComplete;
-    let maxOne;
-    let score=0;
-    for(let i=0;i<rowNumber;i++){
-      almostComplete=true;
-      if (board[i][0]==null) {
-        maxOne=false;
-      }
-      else {
-        maxOne=true;
-      }
-      for(let j=0;j<colNumber;j++){
-        if (board[i][0]==null) {
-          if((board[i][1]!=board[i][j]||board[i][j]==null)&&j>0){
-              almostComplete=false;
-          }
-        }
-        else if (maxOne) {
-          if(board[i][0]!=board[i][j]&&board[i][j]==null){
-              maxOne=false;
-          }
-          else if (board[i][0]!=board[i][j]) {
-            almostComplete=false;
-          }
-        }
-        else if (board[i][0]!=board[i][j]) {
-          almostComplete=false;
-        }
-      }
-      if (almostComplete) {
-        if (board[i][0]!=null) {
-          score+=scores[board[i][0]];
-        }
-        else {
-          score+=scores[board[i][1]];
-        }
-      }
-    }
-    return score;
-}
+
 function checkV(){
   let vertical;
     for(let j=0;j<colNumber;j++){
@@ -365,47 +488,7 @@ function checkV(){
       }
     }
 }
-function checkAV(){
-  let almostComplete;
-  let maxOne;
-  let score=0;
-    for(let j=0;j<colNumber;j++){
-      almostComplete=true;
-      if (board[0][j]==null) {
-        maxOne=false;
-      }
-      else {
-        maxOne=true;
-      }
-      for(let i=0;i<rowNumber;i++){
-        if (board[0][j]==null) {
-          if((board[1][j]!=board[i][j]||board[i][j]==null)&&i>0){
-            almostComplete=false;
-          }
-        }
-        else if (maxOne) {
-          if(board[0][j]!=board[i][j]&&board[i][j]==null){
-              maxOne=false;
-          }
-          else if (board[0][j]!=board[i][j]) {
-            almostComplete=false;
-          }
-        }
-        else if (board[0][j]!=board[i][j]) {
-          almostComplete=false;
-        }
-      }
-      if (almostComplete) {
-        if (board[0][j]!=null) {
-          score+=scores[board[0][j]];
-        }
-        else {
-          score+=scores[board[1][j]];
-        }
-      }
-  }
-  return score;
-}
+
 function checkD1(){
   let diagonal;
   for(let j=0;j<Math.abs(colNumber-rowNumber)+1;j++){
@@ -434,83 +517,6 @@ function checkD1(){
     }
   }
 }
-function checkAD1(){
-  let almostComplete;
-  let maxOne;
-  let score=0;
-  for(let j=0;j<Math.abs(colNumber-rowNumber)+1;j++){
-    almostComplete=true;
-    if (colNumber<=rowNumber) {
-      if (board[j][0]==null) {
-        maxOne=false;
-      }
-      else {
-        maxOne=true;
-      }
-      for(let i=0;i<colNumber;i++){
-        if (board[j][0]==null) {
-          if((board[j+1][1]!=board[i+j][i]||board[i+j][i]==null)&&i!=0){
-            almostComplete=false;
-          }
-        }
-        else if (maxOne) {
-          if(board[j][0]!=board[i+j][i]&&board[i+j][i]==null){
-              maxOne=false;
-          }
-          else if (board[j][0]!=board[i+j][i]) {
-            almostComplete=false;
-          }
-        }
-        else if (board[j][0]!=board[i+j][i]) {
-          almostComplete=false;
-        }
-      }
-      if(almostComplete){
-        if (board[j][0]!=null) {
-          score+=scores[board[j][0]];
-        }
-        else {
-          score+=scores[board[j+1][1]];
-        }
-      }
-    }
-    else {
-      if (board[0][j]==null) {
-        maxOne=false;
-      }
-      else {
-        maxOne=true;
-      }
-      for(let i=0;i<rowNumber;i++){
-        if (board[0][j]==null) {
-          if((board[1][j+1]!=board[i][i+j]||board[i][i+j]==null)&&i!=0){
-            almostComplete=false;
-          }
-        }
-        else if (maxOne) {
-          if(board[0][j]!=board[i][i+j]&&board[i][i+j]==null){
-              maxOne=false;
-          }
-          else if (board[0][j]!=board[i][i+j]) {
-            almostComplete=false;
-          }
-        }
-        else if (board[0][j]!=board[i][i+j]) {
-          almostComplete=false;
-        }
-      }
-      if(almostComplete){
-        if (board[0][j]!=null) {
-          score+=scores[board[0][j]];
-        }
-        else {
-          score+=scores[board[1][j+1]];
-        }
-      }
-    }
-  }
-  return score;
-}
 function checkD2(){
   for(let j=0;j<Math.abs(colNumber-rowNumber)+1;j++){
     diagonal=true;
@@ -537,83 +543,6 @@ function checkD2(){
       }
     }
   }
-}
-function checkAD2(){
-  let almostComplete;
-  let maxOne;
-  let score=0;
-  for(let j=0;j<Math.abs(colNumber-rowNumber)+1;j++){
-    almostComplete=true;
-    if (colNumber<=rowNumber) {
-      if (board[j][colNumber-1]==null) {
-        maxOne=false;
-      }
-      else {
-        maxOne=true;
-      }
-      for(let i=colNumber-1;i>-1;i--){
-        if (board[j][colNumber-1]==null) {
-          if((board[j+1][colNumber-2]!=board[colNumber-1-i+j][i]||board[colNumber-1-i+j][i]==null)&&i!=colNumber-1){
-            almostComplete=false;
-          }
-        }
-        else if (maxOne) {
-          if(board[j][colNumber-1]!=board[colNumber-1-i+j][i]&&board[colNumber-1-i+j][i]==null){
-              maxOne=false;
-          }
-          else if (board[j][colNumber-1]!=board[colNumber-1-i+j][i]) {
-            almostComplete=false;
-          }
-        }
-        else if (board[j][colNumber-1]!=board[colNumber-1-i+j][i]) {
-          almostComplete=false;
-        }
-    }
-    if(almostComplete){
-      if (board[j][colNumber-1]!=null) {
-        score+=scores[board[j][colNumber-1]];
-      }
-      else {
-        score+=scores[board[j+1][colNumber-2]];
-      }
-    }
-  }
-  else {
-  if (board[rowNumber-1][j]==null) {
-    maxOne=false;
-  }
-  else {
-    maxOne=true;
-  }
-  for(let i=rowNumber-1;i>-1;i--){
-    if (board[rowNumber-1][j]==null) {
-      if((board[rowNumber-2][j+1]!=board[i][rowNumber-1-i+j]||board[i][rowNumber-1-i+j]==null)&&i!=rowNumber-1){
-        almostComplete=false;
-      }
-    }
-    else if (maxOne) {
-      if(board[rowNumber-1][j]!=board[i][rowNumber-1-i+j]&&board[i][rowNumber-1-i+j]==null){
-          maxOne=false;
-      }
-      else if (board[rowNumber-1][j]!=board[i][rowNumber-1-i+j]) {
-        almostComplete=false;
-      }
-    }
-    else if (board[rowNumber-1][j]!=board[i][rowNumber-1-i+j]) {
-      almostComplete=false;
-    }
-      }
-      if(almostComplete){
-        if (board[rowNumber-1][j]!=null) {
-          score+=scores[board[rowNumber-1][j]];
-        }
-        else {
-          score+=scores[board[rowNumber-2][j+1]];
-        }
-      }
-  }
-  }
-  return score;
 }
 function checkLeft(){
   let empty=true;
@@ -654,10 +583,6 @@ function checkBottom(){
     }
   }
   return empty;
-}
-function checkState(){
-  console.log('checking...');
-  return checkAH()+checkAV()+checkAD1()+checkAD2();
 }
 function checkWin(){
   stroke('rgba(211, 203, 189,0.3)');
