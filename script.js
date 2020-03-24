@@ -176,11 +176,9 @@ function nextBoard(){
 function minimax(position, depth, alpha, beta, maximizingPlayer){
 
   let spaces=emptyS();
-  console.log(spaces+depth);
   if (spaces+depth>7) {
     let state=checkState();
     if (depth>3) {
-      console.log('YES');
       return state/depth;
     }
   }
